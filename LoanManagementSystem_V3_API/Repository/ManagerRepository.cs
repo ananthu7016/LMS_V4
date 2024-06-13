@@ -4,7 +4,7 @@ using LoanManagementSystem_V3_API.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LoanManagementSystem_WebApi.Repository
+namespace LoanManagementSystem_V3_API
 {
     // This is the Admin Repository
     public class ManagerRepository : IManagerRepository
@@ -13,9 +13,9 @@ namespace LoanManagementSystem_WebApi.Repository
         //first through DI we need to create a instance of the Database context for the Entity Framework
 
         //----------------------------------------------------------
-        private readonly LmsV3DbContext _context;
+        private readonly LmsV4DbContext _context;
 
-        public ManagerRepository(LmsV3DbContext context)
+        public ManagerRepository(LmsV4DbContext context)
         {
             _context = context;
         }
@@ -32,21 +32,22 @@ namespace LoanManagementSystem_WebApi.Repository
                return await (from r in _context.LoanRequests
                        from c in _context.Customers
                        from l in _context.LoanTypes
-                       where r.LoanId == l.LoanId && r.CustId == c.CustId && r.RequestStatus==true
+                       where r.LoanTypeId == l.LoanTypeId && r.CustId == c.CustomerId && r.IsActive==true
                        select new vw_LoanRequest
                        {
-                           CustId = c.CustId,
+                           CustomerId = c.CustomerId,
                            RequestId = r.RequestId,
-                           LoanId = l.LoanId,
-                           LoanName = l.LoanName,
-                           CustomerName = c.CustFirstName + " " + c.CustLastName,
+                           LoanId = l.LoanTypeId,
+                           LoanName = l.LoanTypeName,
+                           CustomerName = c.FullName,
                            LoanPurpose = r.LoanPurpose,
                            LoanRequestDate = r.LoanRequestDateTime,
                            RequestedAmount = r.RequestedAmount
                        }).ToListAsync();
             }
 
-            return null;
+            return new List<vw_LoanRequest>();
+            // if something went wrong we return an empty list 
             
         }
 
@@ -69,7 +70,7 @@ namespace LoanManagementSystem_WebApi.Repository
                                   select new vw_Dropdown
                                   {
                                       Id = u.UserId,
-                                      Name = u.UserName
+                                      Name = u.FullName
                                   }).ToListAsync();
 
                 }
@@ -77,7 +78,7 @@ namespace LoanManagementSystem_WebApi.Repository
          
             }
 
-            return null;// is something went wrong exception will be returned.
+            return new List<vw_Dropdown>();// is something went wrong we return a Empty List
         }
 
         #endregion
@@ -93,9 +94,16 @@ namespace LoanManagementSystem_WebApi.Repository
                 {
                     detail.VerificationReview = "";
                     detail.VerificationStatus = true;
-                      
-                    // then we need to add the instce to DbContext
-                    await _context.LoanVerifications.AddAsync(detail);
+
+                    try
+                    {
+                        // then we need to add the instance to DbContext
+                        await _context.LoanVerifications.AddAsync(detail);
+                    }
+                    catch(Exception ex) { }
+                    
+
+                    // defing an instance to store the details of LoanRequest
                     LoanRequest request = new LoanRequest();
                     try
                     {
@@ -107,13 +115,37 @@ namespace LoanManagementSystem_WebApi.Repository
                     
                     if(request != null)
                     {
-                        request.RequestStatus= false;
+                        request.IsActive= false;
                     }
 
-                    // then we need to save changes to the Database.
+                    try
+                    {
+                        // then we need to save changes to the Database.
+                        await _context.SaveChangesAsync();
+
+                    }
+                    catch (Exception ex) { }
+
+
+                    // then we need to Update the customer about the Action Happend ie Verification Officer Assigned 
+
+                    // creating a new instance of verification summary to store the details to insert \
+                    LoanVerificationSummary summary = new LoanVerificationSummary();
+
+                    // then defining the instance 
+                    summary.RequestId = detail.RequestId;
+                    summary.Summary = "Under Verification";
+                    summary.StatusChangedDateTime = DateTime.Now;
+
+                    //then we need to add instance to Db Set 
+                    await _context.LoanVerificationSummaries.AddAsync(summary);
+
+
+                    // then we need to save changed 
+
                     await _context.SaveChangesAsync();
 
-                    string description = "Manger has assigned a loan verification to " + detail.VerifiedBy;
+                    string description = "Manger has assigned a loan verification to " + detail.UserId;
                     Log newLog = new Log
                     {
                         TimeStamp = DateTime.Now,
@@ -140,8 +172,6 @@ namespace LoanManagementSystem_WebApi.Repository
 
 
         #region Get all Details of Verified Loans for Approval
-
-
         public async Task<ActionResult<IEnumerable<vw_ApprovalDetails>>> GetDetailsOfLoanToApprove()
         {
             if( _context != null )
@@ -152,21 +182,20 @@ namespace LoanManagementSystem_WebApi.Repository
                            from c in _context.Customers
                            from r in _context.LoanRequests
                            from l in _context.LoanTypes
-                           where v.RequestId == r.RequestId && r.CustId == c.CustId && r.LoanId == l.LoanId && v.VerificationStatus == false
+                           where v.RequestId == r.RequestId && r.CustId == c.CustomerId && r.LoanTypeId == l.LoanTypeId && v.VerificationStatus == false
                            select new vw_ApprovalDetails
                            {
                                VerificationId = v.VerificationId,
-                               CustomerId = c.CustId,
-                               CustomerName = c.CustFirstName+" "+c.CustLastName,
-                               CustomerPhone = c.CustPhone,
-                               LoanId = l.LoanId,
-                               LoanName = l.LoanName,
+                               CustomerId = c.CustomerId,
+                               CustomerName = c.FullName,
+                               CustomerPhone = c.Phone,
+                               LoanTypeId = l.LoanTypeId,
+                               LoanName = l.LoanTypeName,
                                LoanAmount = r.RequestedAmount,
                                LoanRequestDate = r.LoanRequestDateTime,
-                               RepaymentFrequency = r.RepaymentFrequency,
-                               Review = v.VerificationReview
-                          
-                              
+                               Review = v.VerificationReview,
+                               LoanPurpose = r.LoanPurpose,
+                               UserId = v.UserId
                            }).ToListAsync();
                 }
                 catch { }
@@ -188,18 +217,16 @@ namespace LoanManagementSystem_WebApi.Repository
            if(_context != null)
             {
                 //first we need to create an instance for LoanDetails 
-                LoanDeatil loanDeatil = new LoanDeatil
+                LoanDetail loanDeatil = new LoanDetail()
                 {
-                    LoanId = loan.LoanId,
+                    LoanTypeId= loan.LoanTypeId,
                     CustId = loan.CustomerId,
                     LoanAmount = loan.LoanAmount,
                     LoanRequestDateTime = loan.LoanRequestDate,
                     LoanSanctionDateTime = DateTime.Now.Date,
-                    LatePaymentPenalty = 0,
-                    OutstandingBalance = loan.LoanAmount,
-                    TotalAmountRepaid = 0,
-                    LoanStatus = true,
-                    RepaymentFrequency = loan.RepaymentFrequency
+                    IsActive = true,
+                    LoanPurpose = loan.LoanPurpose,
+                    UserId = loan.UserId
                 };
 
 
@@ -222,7 +249,7 @@ namespace LoanManagementSystem_WebApi.Repository
                     if (flag == 1)
                     {
 
-                        await _context.LoanDeatils.AddAsync(loanDeatil);
+                        await _context.LoanDetails.AddAsync(loanDeatil);
 
                         // then we need to Remove The Details From Loan Verification Details 
                         _context.LoanVerifications.Remove(verificationDetails);
@@ -231,6 +258,28 @@ namespace LoanManagementSystem_WebApi.Repository
 
                         // then we need to save changes
                         await _context.SaveChangesAsync();
+
+                        //---------------------------------------------------------------------------------
+                        // then we need to update the customer that his loan is approved
+
+                        // creating a new instance of verification summary to store the details to insert 
+                        LoanVerificationSummary summary = new LoanVerificationSummary();
+
+                        // then defining the instance 
+                        summary.RequestId = verificationDetails.RequestId;
+                        summary.Summary = "Loan Approved";
+                        summary.StatusChangedDateTime = DateTime.Now;
+
+                        //then we need to add instance to Db Set 
+                        await _context.LoanVerificationSummaries.AddAsync(summary);
+
+
+                        // then we need to save changed 
+
+                        await _context.SaveChangesAsync();
+                        //-----------------------------------------------------------------------------------
+                        
+                        // then we need to Update the Log for the Admin to see 
 
                         string description = "Manger has approved a loan of " + loan.CustomerName + "who requested for a " + loan.LoanName;
                         Log newLog = new Log
@@ -288,6 +337,27 @@ namespace LoanManagementSystem_WebApi.Repository
                     // then we need to save changes
                     await _context.SaveChangesAsync();
 
+
+
+                    //---------------------------------------------------------------------------------
+                    // creating a new instance of verification summary to store the details to insert 
+                    LoanVerificationSummary summary = new LoanVerificationSummary();
+
+                    // then defining the instance 
+                    summary.RequestId = verificationDetails.RequestId;
+                    summary.Summary = "Loan Approved";
+                    summary.StatusChangedDateTime = DateTime.Now;
+
+                    //then we need to add instance to Db Set 
+                    await _context.LoanVerificationSummaries.AddAsync(summary);
+
+
+                    // then we need to save changed 
+
+                    await _context.SaveChangesAsync();
+                    //-----------------------------------------------------------------------------------
+
+
                     // before that we need to save this details to log 
                     string description = "Manger has rejected a loan of "+loan.CustomerName+ "who requested for a "+loan.LoanName;
                     Log newLog = new Log
@@ -322,7 +392,6 @@ namespace LoanManagementSystem_WebApi.Repository
 
                 //so to the recieved instance we need to add some extra details like The time stamp when it was created 
                 loan.CreatedDateTime = DateTime.Now;
-
                 try
                 {
                     await _context.LoanTypes.AddAsync(loan);
@@ -331,7 +400,7 @@ namespace LoanManagementSystem_WebApi.Repository
                     await _context.SaveChangesAsync();
 
                     // before that we need to save this details to log 
-                    string description = "Manger has added a new Loan  " + loan.LoanName;
+                    string description = "Manger has added a new Loan  " + loan.LoanTypeName;
                     Log newLog = new Log
                     {
                         TimeStamp = DateTime.Now,
@@ -366,12 +435,12 @@ namespace LoanManagementSystem_WebApi.Repository
             if(_context != null)
             {
                 LoanType loanDetails = new LoanType();
-                loanDetails.LoanId = 0;
+                loanDetails.LoanTypeId = 0;
                 // defining and instance to store the details of loan with this id
 
                 try
                 {
-                    loanDetails = await _context.LoanTypes.Where(l=>l.LoanId == loan_id).FirstAsync();
+                    loanDetails = await _context.LoanTypes.Where(l=>l.LoanTypeId == loan_id).FirstAsync();
                     // this will get the detail of loan with this id 
 
                 }catch(Exception e)
@@ -379,10 +448,10 @@ namespace LoanManagementSystem_WebApi.Repository
                     // to catch any exception that maybe raised.
                 }
 
-                if(loanDetails.LoanId != 0)
+                if(loanDetails.LoanTypeId != 0)
                 {
                     // then we have a Loan with the matching ID
-                    loanDetails.LoanStatus = !loanDetails.LoanStatus;
+                    loanDetails.IsActive = !loanDetails.IsActive;
                     // this will toogle the loan status 
 
                     // then we need to save the change to database
@@ -390,7 +459,7 @@ namespace LoanManagementSystem_WebApi.Repository
                     // then we need to return success status;
 
                     // before that we need to save this details to log 
-                    string description = "Manger has set the Status of " + loanDetails.LoanName + " to " + loanDetails.LoanStatus;
+                    string description = "Manger has set the Status of " + loanDetails.LoanTypeName + " to " + loanDetails.IsActive;
                     Log newLog = new Log
                     {
                         TimeStamp = DateTime.Now,

@@ -6,46 +6,33 @@ namespace LoanManagementSystem_V3_API.Model;
 
 public partial class Customer
 {
-    public int CustId { get; set; }
+    public int CustomerId { get; set; }
 
-    public string? CustFirstName { get; set; }
+    public string? FullName { get; set; }
 
-    public string? CustLastName { get; set; }
+    public string? Occupation { get; set; }
 
-    public string? CustOccupation { get; set; }
+    public string? Address { get; set; }
 
-    public string? CustAddress { get; set; }
+    public string? Phone { get; set; }
 
-    public string? CustPhone { get; set; }
+    public string? Aadhar { get; set; }
 
-    public string? CustAadhar { get; set; }
-
-    public string? CustGender { get; set; }
-
-    public DateTime? CustDob { get; set; }
-
-    public string? CustNationality { get; set; }
-
-    public decimal? CustAnnualIncome { get; set; }
+    public DateTime? Dob { get; set; }
 
     public string? UserName { get; set; }
 
     public string? Password { get; set; }
 
-    public bool? CustMaritalStatus { get; set; }
-
     public bool? CustEmploymentStatus { get; set; }
 
-    public DateTime? RegistredDateTime { get; set; }
+    public DateTime? RegisteredDateTime { get; set; }
 
-    public bool? CustStatus { get; set; }
+    public bool? IsActive { get; set; }
 
     [JsonIgnore]
-    public virtual ICollection<LoanDeatil> LoanDeatils { get; set; } = new List<LoanDeatil>();
+    public virtual ICollection<LoanDetail> LoanDetails { get; set; } = new List<LoanDetail>();
 
     [JsonIgnore]
     public virtual ICollection<LoanRequest> LoanRequests { get; set; } = new List<LoanRequest>();
-
-    [JsonIgnore]
-    public virtual ICollection<UploadedDocument> UploadedDocuments { get; set; } = new List<UploadedDocument>();
 }

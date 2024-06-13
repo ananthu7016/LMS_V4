@@ -48,14 +48,14 @@ namespace LoanManagementSystem_WebApi.Controllers
         #endregion
 
 
-        #region Get Details Of All Loans Taken By a Customer
+        #region Get Status of Loans Applied by Customer
      //   [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("{custId}")]
-        public async Task<ActionResult<IEnumerable<vw_LoanDetailsOfCustomer>>> GetAllLoansOfCustomer(int custId)
+        public async Task<ActionResult<IEnumerable<vw_LoanStatusUpdate>>> GetStatusUpdateOfLoans(int custId)
         {
             if(_repository !=null)
             {
-                return await _repository.GetAllLoansOfCustomer(custId);
+                return await _repository.GetStatusUpdateOfLoans(custId);
             }
             else
             {
@@ -74,7 +74,8 @@ namespace LoanManagementSystem_WebApi.Controllers
             if (_repository != null)
                 return await _repository.GetDetailsOfAllLoans();
             else
-                return null;
+                return new List<LoanType>();
+            //returning an empty instance if something went wrong
         }
 
         #endregion
@@ -109,32 +110,6 @@ namespace LoanManagementSystem_WebApi.Controllers
 
         #endregion
 
-
-        #region Upload a Document for Verification 
-        [HttpPost("Document")]
-        public async Task<ActionResult<int>> UploadADocument(UploadedDocument document)
-        {
-            if (_repository != null && document != null)
-                return await _repository.UploadADocument(document);
-            else
-                return 0;
-        }
-
-        #endregion
-
-
-        #region Change User Credentials 
-        [HttpPut("Credentials")]
-        public async Task<ActionResult<int>> UpdateUserCredentials(vw_LoginRepsonse credentials)
-        {
-            if (_repository != null)
-            {
-                return await _repository.UpdateUserCredentials(credentials);
-            }
-            return 0;
-        }
-
-        #endregion
 
     }
 }

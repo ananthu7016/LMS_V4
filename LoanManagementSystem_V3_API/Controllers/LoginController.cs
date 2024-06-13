@@ -46,13 +46,19 @@ namespace LoanManagementSystem_V3_API.Controllers
                 // then we need to get the token for the user 
                 string Token = GenerateJWTToken();
 
-                return Ok(new
+                if(user.UserId != 0)
                 {
-                    Id = user.UserId,
-                    UserName = user.UserName,
-                    RoleId = user.RoleId,
-                    Token = Token
-                });
+                    return Ok(new
+                    {
+                        Id = user.UserId,
+                        UserName = user.FullName,
+                        RoleId = user.RoleId,
+                        Token = Token
+                    });
+                }
+                else
+                    return Unauthorized();
+    
             }
             else
                 return NotFound();
@@ -78,16 +84,23 @@ namespace LoanManagementSystem_V3_API.Controllers
                 // then we need to get the token for the user 
                 string Token = GenerateJWTToken();
     
-                return Ok(new
+                if(customer.CustomerId != 0)
                 {
-                    Id = customer.CustId,
-                    UserName = customer.UserName,
-                    RoleId = 2,
-                    Token = Token
-                });
+                    return Ok(new
+                    {
+                        Id = customer.CustomerId,
+                        UserName = customer.FullName,
+                        RoleId = 2,
+                        Token = Token
+                    });
+                }
+                else
+                    return Unauthorized();
+                    
+
             }
             else
-                return NotFound();
+                return Unauthorized();
         }
 
         #endregion

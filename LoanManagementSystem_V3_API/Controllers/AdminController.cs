@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using LoanManagementSystem_WebApi.Repository;
 using LoanManagementSystem_V3_API.ViewModel;
 using LoanManagementSystem_V3_API.Model;
+using LoanManagementSystem_V3_API;
 
 namespace LoanManagementSystem_WebApi.Controllers
 {

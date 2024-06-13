@@ -16,9 +16,9 @@ namespace LoanManagementSystem_V3_API.Repository
         // first we need to get access to the Database context throgh the instance which is created by  DI
 
         // defining a private readonly instance to store the instance 
-        private readonly LmsV3DbContext _context;
+        private readonly LmsV4DbContext _context;
 
-        public LoginRepositiory(LmsV3DbContext context)
+        public LoginRepositiory(LmsV4DbContext context)
         {
             _context = context;
         }
@@ -65,7 +65,7 @@ namespace LoanManagementSystem_V3_API.Repository
         public async Task<Customer> ValidateCustomer(string username, string password)
         {
             Customer customer = new Customer();
-            customer.CustId = 0;
+            customer.CustomerId = 0;
             // this is to store the instance of the customer created
             if (_context !=null)
             {

@@ -13,7 +13,7 @@
         public string? LoanName { get; set; }
         // getter and setter for the loan name 
 
-        public int? CustId { get; set; }
+        public int? CustomerId { get; set; }
         //getter and setter for the customer ID
 
         public string? CustomerName { get; set; }    

@@ -40,7 +40,8 @@ namespace LoanManagementSystem_WebApi.Controllers
             {
                 return await _repository.GetAllRequestedLoans();
             }
-            return null;
+            return new List<vw_LoanRequest>();
+            // return an empty List if something went wrong.
         }
 
 
@@ -55,7 +56,8 @@ namespace LoanManagementSystem_WebApi.Controllers
             if (_repository != null)
                 return await _repository.GetDetailsOfOfficers();
             else
-                return null;
+                return new List<vw_Dropdown>();
+            // returning an empty list if something went wrong.
         }
 
         #endregion

@@ -2,8 +2,7 @@
 using LoanManagementSystem_V3_API.Model;
 
 using Microsoft.AspNetCore.Mvc;
-
-namespace LoanManagementSystem_WebApi.Repository
+namespace LoanManagementSystem_V3_API
 {
     public interface IAdminRepository
     {

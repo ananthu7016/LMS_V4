@@ -1,7 +1,6 @@
 ﻿using LoanManagementSystem_V3_API.Model;
 using LoanManagementSystem_V3_API.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-
 namespace LoanManagementSystem_V3_API.Repository
 {
     public interface IManagerRepository

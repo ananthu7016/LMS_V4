@@ -15,7 +15,7 @@
         public string? CustomerPhone { get; set; }
         // this is a getter and setter to store the Phone number of Customer
 
-        public int? LoanId { get; set; }
+        public int? LoanTypeId { get; set; }
         // this is a getter and setter for Loan Id 
 
         public string? LoanName { get; set; }
@@ -27,12 +27,13 @@
         public string? Review {  get; set; }
         // this is a getter and setter to store the verification review.
 
+        public string? LoanPurpose { get; set; }
+        // this is a getter and setter for storing loan purpose
 
+        public int? UserId { get; set; }
+        // this is a getter and setter for UserId
         public DateTime? LoanRequestDate { get; set; }
         // this is a getter and setter for Loan Request date 
-
-        public int? RepaymentFrequency { get; set; }
-        // this is a getter and setter to store the Repayment Frequnecy Selected by the customer
 
 
 

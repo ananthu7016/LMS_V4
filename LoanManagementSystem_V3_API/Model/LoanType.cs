@@ -6,9 +6,9 @@ namespace LoanManagementSystem_V3_API.Model;
 
 public partial class LoanType
 {
-    public int LoanId { get; set; }
+    public int LoanTypeId { get; set; }
 
-    public string? LoanName { get; set; }
+    public string? LoanTypeName { get; set; }
 
     public string? LoanDescription { get; set; }
 
@@ -16,32 +16,22 @@ public partial class LoanType
 
     public decimal? LoanMaximumAmount { get; set; }
 
-    public decimal? LoanIntrestRate { get; set; }
-
-    public decimal? LatePaymentPenalty { get; set; }
+    public decimal? LoanInterestRate { get; set; }
 
     public decimal? ProcessingFee { get; set; }
 
     public decimal? TaxPercentage { get; set; }
 
-    public int? RepaymentFrequency { get; set; }
-
-    public int? GracePeriod { get; set; }
-
-    public bool? EmployementStatusRequired { get; set; }
-
-    public bool? CollateralRequired { get; set; }
+    public bool? IsEmploymentStatusRequired { get; set; }
 
     public int? LoanTerm { get; set; }
 
-    [JsonIgnore]
     public DateTime? CreatedDateTime { get; set; }
 
-    [JsonIgnore]
-    public bool? LoanStatus { get; set; }
+    public bool? IsActive { get; set; }
 
     [JsonIgnore]
-    public virtual ICollection<LoanDeatil> LoanDeatils { get; set; } = new List<LoanDeatil>();
+    public virtual ICollection<LoanDetail> LoanDetails { get; set; } = new List<LoanDetail>();
 
     [JsonIgnore]
     public virtual ICollection<LoanRequest> LoanRequests { get; set; } = new List<LoanRequest>();

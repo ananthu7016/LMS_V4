@@ -20,9 +20,9 @@ namespace LoanManagementSystem_V3_API.Repository
 
 
 
-        #region Get Details Of All Loans Taken By a Customer
+        #region Get Status Updates of Loan Applied by customer
 
-        Task<ActionResult<IEnumerable<vw_LoanDetailsOfCustomer>>> GetAllLoansOfCustomer(int custId);
+        Task<ActionResult<IEnumerable<vw_LoanStatusUpdate>>> GetStatusUpdateOfLoans(int custId);
 
         #endregion
 
@@ -30,13 +30,6 @@ namespace LoanManagementSystem_V3_API.Repository
         #region Get Details of All Available Loans
 
         Task<ActionResult<IEnumerable<LoanType>>> GetDetailsOfAllLoans();
-
-        #endregion
-
-
-        #region Get Details of Logged in Customer 
-        
-        Task<ActionResult<Customer>> GetCustomerDetails(int custId);
 
         #endregion
 
@@ -54,16 +47,5 @@ namespace LoanManagementSystem_V3_API.Repository
 
         #endregion
 
-
-        #region Upload a Document for Verification 
-        Task<ActionResult<int>> UploadADocument(UploadedDocument document);
-
-        #endregion
-
-        #region Change User Credentials 
-
-        Task<ActionResult<int>> UpdateUserCredentials(vw_LoginRepsonse credentials);
-
-        #endregion
     }
 }

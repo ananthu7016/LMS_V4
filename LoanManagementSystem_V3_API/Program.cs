@@ -1,7 +1,7 @@
 
+
 using LoanManagementSystem_V3_API.Model;
 using LoanManagementSystem_V3_API.Repository;
-using LoanManagementSystem_WebApi.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -23,7 +23,7 @@ namespace LoanManagementSystem_V3_API
 
 
             //For The connection string and the Db Context 
-            builder.Services.AddDbContext<LmsV3DbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("LMS_ConnectionString")));
+            builder.Services.AddDbContext<LmsV4DbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("LMS_ConnectionString")));
 
 
             //Then we need to add the Scoped For The Repository 

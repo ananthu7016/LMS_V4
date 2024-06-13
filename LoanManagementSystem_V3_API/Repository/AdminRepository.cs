@@ -3,7 +3,7 @@ using LoanManagementSystem_V3_API.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LoanManagementSystem_WebApi.Repository
+namespace LoanManagementSystem_V3_API
 {
     public class AdminRepository:IAdminRepository
     {
@@ -11,9 +11,9 @@ namespace LoanManagementSystem_WebApi.Repository
 
         // first through DI we need to get the instance of Database context
 
-        private readonly LmsV3DbContext _context;
+        private readonly LmsV4DbContext _context;
 
-        public AdminRepository(LmsV3DbContext context)
+        public AdminRepository(LmsV4DbContext context)
         {
             _context = context;
         }

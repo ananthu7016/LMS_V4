@@ -26,10 +26,5 @@ namespace LoanManagementSystem_V3_API.Repository
         #endregion
 
 
-        #region Get Details of all Documents Uploaded by a Customer 
-
-        Task<ActionResult<IEnumerable<vw_Documents>>> GetDocumentOfCustomer(int customer_id);
-
-        #endregion
     }
 }
